@@ -1,9 +1,12 @@
 package models
 
 import (
+	"errors"
+	"fmt"
+	"jwt-authorizer/utils/token"
+
 	"github.com/jinzhu/gorm"
 	"golang.org/x/crypto/bcrypt"
-	"jwt-authorizer/utils/token"
 )
 
 type User struct {
@@ -64,5 +67,26 @@ func LoginCheck(username string, password string) (string, error) {
 	}
 
 	return token, nil
+}
 
+
+func GetUserById(uid uint) (User, error){
+	var user User
+	fmt.Println("user id")
+	fmt.Println(uid)
+
+	if err := DB.First(&user, uid).Error; err != nil{
+		fmt.Println("user")
+		fmt.Println(user)
+		fmt.Println(err)
+		return user, errors.New("User not found")
+	}
+
+	user.PrepareGive()
+
+	return user, nil
+}
+
+func (user *User) PrepareGive() {
+	user.Password = ""
 }
